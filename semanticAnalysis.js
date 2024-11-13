@@ -24,6 +24,8 @@ function analyze(statement, environment) {
             if (statement.expression.type == I32_IDENTIFIER) {
                 reportError(statement.type.line, "", "Tried to assign an i32 to a string.");
             }
+        } else if (statement.type.type == statement.expression.type) {
+            reportError(statement.type.line, "", `Invalid assignment. Tried to assign ${statement.expression.type} to ${statement.type.type}`);
         }
 
         environment.define(statement.name.lexeme, statement.expression, statement.type);
