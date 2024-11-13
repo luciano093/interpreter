@@ -9,6 +9,8 @@ export const RIGHT_PARENTHESIS = Symbol.for("RIGHT PARENTHESIS");
 export const PLUS = Symbol.for("PLUS");
 export const MINUS = Symbol.for("MINUS");
 export const MODULO = Symbol.for("MODULO");
+export const ASTERISK = Symbol.for("ASTERISK");
+export const SLASH = Symbol.for("SLASH");
 
 export const EQUAL = Symbol.for("EQUAL");
 export const LESS_THAN = Symbol.for("LESS_THAN");

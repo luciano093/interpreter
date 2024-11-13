@@ -1,4 +1,4 @@
-import { EOF, EQUAL, I32, I32_IDENTIFIER, IDENTIFIER, LET, SEMICOLON, TYPE_SPECIFIER, PLUS, PRINT, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, IF, ELSE, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL } from "./symbols.js";
+import { EOF, EQUAL, I32, I32_IDENTIFIER, IDENTIFIER, LET, SEMICOLON, TYPE_SPECIFIER, PLUS, PRINT, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, IF, ELSE, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, SLASH, ASTERISK } from "./symbols.js";
 import { Token } from "./token.js";
 import { generateError } from "./error.js";
 
@@ -36,6 +36,9 @@ function scanToken(lexer) {
     const character = advance(lexer);
 
     switch (character) {
+        case "*":
+            addToken(lexer, ASTERISK);
+            break;
         case "%":
             addToken(lexer, MODULO);
             break;
@@ -89,6 +92,8 @@ function scanToken(lexer) {
                 while(peek(lexer) != "\n" && !isAtEnd(lexer)) {
                     advance(lexer);
                 }
+            } else {
+                addToken(lexer, SLASH);
             }
             break;
         case "(":

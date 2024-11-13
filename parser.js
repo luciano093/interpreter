@@ -1,4 +1,4 @@
-import { I32, EOF, PLUS, SEMICOLON, PRINT, LET, IDENTIFIER, EQUAL, TYPE_SPECIFIER, I32_IDENTIFIER, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, IF, ELSE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL } from "./symbols.js";
+import { I32, EOF, PLUS, SEMICOLON, PRINT, LET, IDENTIFIER, EQUAL, TYPE_SPECIFIER, I32_IDENTIFIER, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, IF, ELSE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, ASTERISK, SLASH } from "./symbols.js";
 import { Unary, Binary, Literal, Grouping, Variable, Assign, Logical } from "./expression.js";
 import { Block, Expression, If, Let, Print, While } from "./statement.js";
 import { reportError } from "./error.js";
@@ -294,7 +294,7 @@ function term(tokens, parser) {
 function factor(tokens, parser) {
     let expression = unary(tokens, parser);
 
-    while(match(tokens, parser, MODULO)) {
+    while(match(tokens, parser, MODULO, ASTERISK, SLASH)) {
         let operator = previous(tokens, parser);
         let right = unary(tokens, parser);
         expression = new Binary(expression, operator, right);

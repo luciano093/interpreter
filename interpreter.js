@@ -1,7 +1,7 @@
 import { Environment } from "./environment.js";
 import { Assign, Binary, Literal, Logical, Variable } from "./expression.js";
 import { Block, Expression, If, Let, Print, While } from "./statement.js";
-import { EQUAL_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL, MINUS, MODULO, OR, PLUS } from "./symbols.js";
+import { ASTERISK, EQUAL_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL, MINUS, MODULO, OR, PLUS, SLASH } from "./symbols.js";
 
 export function interpret(statements) {
     const environment = new Environment();
@@ -18,6 +18,10 @@ function evaluate(statement, environment) {
         const right = evaluate(statement.right, environment);
         
         switch (statement.operator.type) {
+            case ASTERISK:
+                return left * right;
+            case SLASH:
+                return left / right;
             case MODULO:
                 return left % right;
             case PLUS:
