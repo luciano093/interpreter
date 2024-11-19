@@ -37,3 +37,11 @@ export class Let {
         this.expression = expression;
     }
 }
+
+export class FunctionDeclaration {
+    constructor(name, parameters, body) {
+        this.name = name;
+        this.parameters = parameters;
+        this.body = body;
+    }
+}

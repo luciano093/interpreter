@@ -1,9 +1,10 @@
-import { EOF, EQUAL, I32, I32_IDENTIFIER, IDENTIFIER, LET, SEMICOLON, TYPE_SPECIFIER, PLUS, PRINT, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, IF, ELSE, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, SLASH, ASTERISK } from "./symbols.js";
+import { EOF, EQUAL, I32, I32_IDENTIFIER, IDENTIFIER, LET, SEMICOLON, TYPE_SPECIFIER, PLUS, PRINT, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, IF, ELSE, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, SLASH, ASTERISK, COMMA, FN } from "./symbols.js";
 import { Token } from "./token.js";
 import { generateError } from "./error.js";
 
 const keywords = {
     "let": LET,
+    "fn": FN,
     "if": IF,
     "while": WHILE,
     "for": FOR,
@@ -107,6 +108,9 @@ function scanToken(lexer) {
             break;
         case "}":
             addToken(lexer, RIGHT_BRACE);
+            break;
+        case ",":
+            addToken(lexer, COMMA);
             break;
         case "\"":
             while(peek(lexer) != "\"" && peek(lexer) != "\n" && !isAtEnd(lexer)) {

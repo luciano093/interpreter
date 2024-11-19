@@ -20,6 +20,14 @@ export class Grouping {
     }
 }
 
+export class Call {
+    constructor(callee, parent, args) {
+        this.callee = callee;
+        this.parent = parent;
+        this.args = args;
+    }
+}
+
 export class Literal {
     constructor(value, type) {
         this.value = value;

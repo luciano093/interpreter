@@ -1,6 +1,6 @@
-import { I32, EOF, PLUS, SEMICOLON, PRINT, LET, IDENTIFIER, EQUAL, TYPE_SPECIFIER, I32_IDENTIFIER, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, IF, ELSE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, ASTERISK, SLASH } from "./symbols.js";
-import { Unary, Binary, Literal, Grouping, Variable, Assign, Logical } from "./expression.js";
-import { Block, Expression, If, Let, Print, While } from "./statement.js";
+import { I32, EOF, PLUS, SEMICOLON, PRINT, LET, IDENTIFIER, EQUAL, TYPE_SPECIFIER, I32_IDENTIFIER, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, IF, ELSE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, ASTERISK, SLASH, COMMA, FN } from "./symbols.js";
+import { Unary, Binary, Literal, Grouping, Variable, Assign, Logical, Call } from "./expression.js";
+import { Block, Expression, FunctionDeclaration, If, Let, Print, While } from "./statement.js";
 import { reportError } from "./error.js";
 
 export function parse(tokens) {
@@ -29,8 +29,28 @@ export function parse(tokens) {
 
 function declaration(tokens, parser) {
     if(match(tokens, parser, LET)) return letDeclaration(tokens, parser);
+    if(match(tokens, parser, FN)) return functionDeclaration(tokens, parser);
 
     return statement(tokens, parser);
+}
+
+function functionDeclaration(tokens, parser) {
+    let name = primary(tokens, parser);
+
+    if(!(name instanceof Variable)) {
+        reportParserError(name, "Incorrect function declaration");
+    }
+
+    consume(tokens, parser, LEFT_PARENTHESIS, "Expected parenthesis.");
+
+    let arg_identifiers = args(tokens, parser);
+
+    consume(tokens, parser, RIGHT_PARENTHESIS, "Unclosed parenthesis.");
+
+    consume(tokens, parser, LEFT_BRACE, "Expected block for unparethisized if.");
+    let body = new Block(block(tokens, parser));
+
+    return new FunctionDeclaration(name, arg_identifiers, body);
 }
 
 function letDeclaration(tokens, parser) {
@@ -137,15 +157,11 @@ function forStatement(tokens, parser) {
         consume(tokens, parser, SEMICOLON, "Missing semicolon.");
     }
 
-    console.log(variable);
-
     let condition = null;
     console.log(check(tokens, parser, SEMICOLON));
     if (!check(tokens, parser, SEMICOLON)) {
         condition = expression(tokens, parser);
     }
-
-    console.log(condition);
 
     consume(tokens, parser, SEMICOLON, "Missing semicolon.");
 
@@ -310,7 +326,34 @@ function unary(tokens, parser) {
         return new Unary(operator, right);
     }
     
-    return primary(tokens, parser);
+    return call(tokens, parser);
+}
+
+function call(tokens, parser) {
+    let identifier = primary(tokens, parser);
+
+    if (match(tokens, parser, LEFT_PARENTHESIS)) {
+        let arg_identifiers = args(tokens, parser);
+        consume(tokens, parser, RIGHT_PARENTHESIS);
+
+        return new Call(identifier, null, arg_identifiers);
+    }
+
+    return identifier;
+}
+
+function args(tokens, parser) {
+    let args = [];
+
+    if(!check(tokens, parser, RIGHT_PARENTHESIS)) {
+        args.push(expression(tokens, parser));
+    }
+
+    while(match(tokens, parser, COMMA)) {
+        args.push(expression(tokens, parser));
+    }
+
+    return args;
 }
 
 function primary(tokens, parser) {

@@ -10,6 +10,8 @@ export function semanticAnalysis(statements, environment) {
     }
 }
 
+// todo check for function arity
+
 function analyze(statement, environment) {
     if (statement instanceof Let) {
         if (statement.expression === null) {

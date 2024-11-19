@@ -11,6 +11,7 @@ export const MINUS = Symbol.for("MINUS");
 export const MODULO = Symbol.for("MODULO");
 export const ASTERISK = Symbol.for("ASTERISK");
 export const SLASH = Symbol.for("SLASH");
+export const COMMA = Symbol.for("COMMA");
 
 export const EQUAL = Symbol.for("EQUAL");
 export const LESS_THAN = Symbol.for("LESS_THAN");
@@ -38,6 +39,7 @@ export const WHILE = Symbol.for("WHILE");
 export const FOR = Symbol.for("FOR");
 export const ELSE = Symbol.for("ELSE");
 export const LET = Symbol.for("LET");
+export const FN = Symbol.for("FN");
 export const EOF = Symbol.for("EOF");
 
 // temporary
