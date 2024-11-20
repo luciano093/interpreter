@@ -1,6 +1,6 @@
-import { I32, EOF, PLUS, SEMICOLON, PRINT, LET, IDENTIFIER, EQUAL, TYPE_SPECIFIER, I32_IDENTIFIER, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, IF, ELSE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, ASTERISK, SLASH, COMMA, FN } from "./symbols.js";
+import { I32, EOF, PLUS, SEMICOLON, PRINT, LET, IDENTIFIER, EQUAL, TYPE_SPECIFIER, I32_IDENTIFIER, STRING, STRING_IDENTIFIER, LEFT_BRACE, RIGHT_BRACE, IF, ELSE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, EQUAL_EQUAL, OR, AND, WHILE, MINUS, LESS_THAN, GREATER_THAN, MODULO, FOR, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, ASTERISK, SLASH, COMMA, FN, RETURN } from "./symbols.js";
 import { Unary, Binary, Literal, Grouping, Variable, Assign, Logical, Call } from "./expression.js";
-import { Block, Expression, FunctionDeclaration, If, Let, Print, While } from "./statement.js";
+import { Block, Expression, FunctionDeclaration, If, Let, Print, Return, While } from "./statement.js";
 import { reportError } from "./error.js";
 
 export function parse(tokens) {
@@ -54,6 +54,13 @@ function functionDeclaration(tokens, parser) {
 }
 
 function letDeclaration(tokens, parser) {
+    let {name, type, expr} = variableDeclaration(tokens, parser);
+
+    consume(tokens, parser, SEMICOLON, "Expected ';' after expression.");
+    return new Let(name, type, expr);
+}
+
+function variableDeclaration(tokens, parser) {
     const name = consume(tokens, parser, IDENTIFIER, "Expected variable name.");
 
     consume(tokens, parser, TYPE_SPECIFIER, "Expected type.");
@@ -64,8 +71,11 @@ function letDeclaration(tokens, parser) {
         expr = expression(tokens, parser);
     }
 
-    consume(tokens, parser, SEMICOLON, "Expected ';' after expression.");
-    return new Let(name, type, expr);
+    return {
+        name,
+        type,
+        expr,
+    };
 }
 
 function typeIdentifier(tokens, parser) {
@@ -108,10 +118,21 @@ function statement(tokens, parser) {
        return new Block(block(tokens, parser));
     }
 
+    if(match(tokens, parser, RETURN)) {
+        return returnStatement(tokens, parser);
+     }
+
     const expr = expression(tokens, parser);
     consume(tokens, parser, SEMICOLON, "Expected ';' after expression.");
 
     return new Expression(expr);
+}
+
+function returnStatement(tokens, parser) {
+    let value = expression(tokens, parser);
+    consume(tokens, parser, SEMICOLON, "Expected ';' after return statement.");
+
+    return new Return(previous(tokens, parser), value);
 }
 
 function ifStatement(tokens, parser) {

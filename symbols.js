@@ -40,6 +40,7 @@ export const FOR = Symbol.for("FOR");
 export const ELSE = Symbol.for("ELSE");
 export const LET = Symbol.for("LET");
 export const FN = Symbol.for("FN");
+export const RETURN = Symbol.for("RETURN");
 export const EOF = Symbol.for("EOF");
 
 // temporary

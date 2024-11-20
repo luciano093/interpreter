@@ -45,3 +45,10 @@ export class FunctionDeclaration {
         this.body = body;
     }
 }
+
+export class Return {
+    constructor(token, value) {
+        this.token = token;
+        this.value = value;
+    }
+}

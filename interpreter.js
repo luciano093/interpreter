@@ -1,6 +1,6 @@
 import { Environment } from "./environment.js";
 import { Assign, Binary, Call, Literal, Logical, Variable } from "./expression.js";
-import { Block, Expression, FunctionDeclaration, If, Let, Print, While } from "./statement.js";
+import { Block, Expression, FunctionDeclaration, If, Let, Print, Return, While } from "./statement.js";
 import { ASTERISK, EQUAL_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL, MINUS, MODULO, OR, PLUS, SLASH } from "./symbols.js";
 
 export function interpret(statements) {
@@ -93,29 +93,38 @@ function evaluate(statement, environment) {
         console.log(evaluate(statement.expression, environment));
         return;
     } else if (statement instanceof Call) {
+        let previous = null;
         let args = [];
+        try {
+            for (const arg of statement.args) {
+                args.push(evaluate(arg, environment));
+            }
 
-        for (const arg of statement.args) {
-            args.push(evaluate(arg, environment));
+            let fn = environment.get(statement.callee.name);
+
+            previous = environment;
+            environment = new Environment(environment);
+            
+            for (let i = 0; i < fn.parameters.length; ++i) {
+                environment.define(fn.parameters[i].name.lexeme, args[i]);
+            }
+            
+            evaluate(fn.body, environment);
+
+            environment = previous;
+
+            return;
+        } catch (error) {
+            if (error instanceof Return) {
+                environment = previous;
+                return error.value.value;
+            }
         }
-
-        let fn = environment.get(statement.callee.name);
-
-        const previous = environment;
-        environment = new Environment(environment);
-        
-        for (let i = 0; i < fn.parameters.length; ++i) {
-            environment.define(fn.parameters[i].name.lexeme, args[i]);
-        }
-
-        evaluate(fn.body, environment);
-
-        environment = previous;
-
-        return;
     } else if (statement instanceof FunctionDeclaration) {
         environment.define(statement.name.name.lexeme, statement);
         return;
+    } else if (statement instanceof Return) {
+        throw statement;
     }
 
     console.log(statement);
