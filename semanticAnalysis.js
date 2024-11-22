@@ -1,7 +1,7 @@
 import { Environment } from "./environment.js";
 import { reportError } from "./error.js";
-import { Assign, Binary, Literal, Unary, Variable } from "./expression.js";
-import { Block, Expression, Let, Print } from "./statement.js";
+import { Assign, Binary, Call, Literal, Unary, Variable } from "./expression.js";
+import { Block, Expression, FunctionDeclaration, Let, Print } from "./statement.js";
 import { I32_IDENTIFIER, PLUS, STRING_IDENTIFIER } from "./symbols.js";
 
 export function semanticAnalysis(statements, environment) {
@@ -17,16 +17,16 @@ function analyze(statement, environment) {
         if (statement.expression === null) {
             
         }
-        else if (statement.type.type == I32_IDENTIFIER) {
-            if (statement.expression.type == STRING_IDENTIFIER) {
+        else if (statement.type.type === I32_IDENTIFIER) {
+            if (statement.expression.type === STRING_IDENTIFIER) {
                 reportError(statement.type.line, "", "Tried to assign a string to an i32.");
             }
         }
-        else if (statement.type.type == STRING_IDENTIFIER) {
-            if (statement.expression.type == I32_IDENTIFIER) {
+        else if (statement.type.type === STRING_IDENTIFIER) {
+            if (statement.expression.type === I32_IDENTIFIER) {
                 reportError(statement.type.line, "", "Tried to assign an i32 to a string.");
             }
-        } else if (statement.type.type == statement.expression.type) {
+        } else if (statement.type.type !== statement.expression.type) {
             reportError(statement.type.line, "", `Invalid assignment. Tried to assign ${statement.expression.type} to ${statement.type.type}`);
         }
 
@@ -41,6 +41,8 @@ function analyze(statement, environment) {
             analyze(stmt, environment);
         }
         environment = previous;
+    } else if (statement instanceof FunctionDeclaration) {
+        environment.define(statement.name.name.lexeme, statement);
     }
 }
 
@@ -70,6 +72,19 @@ function analyzeExpression(statement, environment, expression) {
 
         if(left != right) {
             reportError(expression.name.line, ` at ${expression.name.lexeme}`, "Invalid assigment.");
+        }
+    } else if (expression instanceof Call) {
+        console.log(expression);
+        let fn = environment.get(expression.callee.name);
+
+        if (expression.args.length != fn.parameters.length) {
+            reportError(expression.callee.name.line, ` at ${expression.args[0].value}`, "Incorrect number of arguments");
+        }
+
+        // Todo: verify types
+        for (let i = 0; i < expression.args.length; ++i) {
+            // console.log(expression.args[i]);
+            // console.log(fn.parameters[i]);
         }
     }
 }

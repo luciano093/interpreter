@@ -95,6 +95,7 @@ function evaluate(statement, environment) {
     } else if (statement instanceof Call) {
         let previous = null;
         let args = [];
+
         try {
             for (const arg of statement.args) {
                 args.push(evaluate(arg, environment));

@@ -43,7 +43,7 @@ function functionDeclaration(tokens, parser) {
 
     consume(tokens, parser, LEFT_PARENTHESIS, "Expected parenthesis.");
 
-    let arg_identifiers = args(tokens, parser);
+    let arg_identifiers = parameters(tokens, parser);
 
     consume(tokens, parser, RIGHT_PARENTHESIS, "Unclosed parenthesis.");
 
@@ -53,8 +53,25 @@ function functionDeclaration(tokens, parser) {
     return new FunctionDeclaration(name, arg_identifiers, body);
 }
 
+function parameters(tokens, parser) {
+    let args = [];
+
+    if(!check(tokens, parser, RIGHT_PARENTHESIS)) {
+        do {
+            args.push(new Variable(variableDeclaration(tokens, parser).name));
+        } while(match(tokens, parser, COMMA));
+    }
+
+    return args;
+}
+
 function letDeclaration(tokens, parser) {
-    let {name, type, expr} = variableDeclaration(tokens, parser);
+    let {name, type} = variableDeclaration(tokens, parser);
+
+    let expr = null;
+    if (match(tokens, parser, EQUAL)) {
+        expr = expression(tokens, parser);
+    }
 
     consume(tokens, parser, SEMICOLON, "Expected ';' after expression.");
     return new Let(name, type, expr);
@@ -66,15 +83,9 @@ function variableDeclaration(tokens, parser) {
     consume(tokens, parser, TYPE_SPECIFIER, "Expected type.");
     const type = typeIdentifier(tokens, parser);
 
-    let expr = null;
-    if (match(tokens, parser, EQUAL)) {
-        expr = expression(tokens, parser);
-    }
-
     return {
         name,
         type,
-        expr,
     };
 }
 
